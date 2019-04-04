@@ -57,7 +57,7 @@ public function totalCount($where = [], $where_not = [])
 
   </table>
 
-  <!--  <?=  $OpsPaginator->toHtml(); ?> //toHtml() function on [OpsPaginator() class]
+   <?=  $OpsPaginator->toHtml(); ?> <!-- //toHtml() function on [OpsPaginator() class]
   
     -->
   </div>
