@@ -22,7 +22,7 @@ public function totalCount($where = [], $where_not = [])
                 $cnt++;
             }
         }
-        // $where_query = empty($where_query) ? '' : "WHERE {$where_query}"; 
+        // $where_query = empty($where_query) ? '' : "WHERE {$where_query}";  //using this line of code when we get data by any specification
         return $this->db->get_col("SELECT count(*) FROM $this->table $where_query");
     }
 
