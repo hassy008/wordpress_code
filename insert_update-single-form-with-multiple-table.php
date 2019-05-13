@@ -331,6 +331,10 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 										<div class="select-wrapper">
 											<select class="select-style form-control details-input-control" name="data[hotelBooking][hotel_name]">
 												<option value=""></option>
+				<!--hotel name form hotel table
+					<?=[ $hotel->id] == $hotel_booking->hotel_name ? 'selected' : '' ?>-> id from hotel table
+						[$hotel_booking->hotel_name]-> match with hotel_booking table 
+				-->								
 											<?php foreach ($hotels as  $hotel) { ?>
 												<option <?= $hotel->id == $hotel_booking->hotel_name ? 'selected' : '' ?> value="<?=$hotel->id ?>"><?= $hotel->name; ?></option>	
 											<?php } ?>
