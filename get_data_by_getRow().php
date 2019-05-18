@@ -1,11 +1,12 @@
 <?php
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 $OpsAttendee = new OpsAttendee();
 $OpsHotelBooking = new OpsHotelBooking();
 $OpsFlight = new OpsFlight();
 $OpsItem 	= new OpsItem();
 $OpsProduct = new OpsProduct();
-$OpsHotel 	  = new OpsHotel();	
 $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 
     // $general_info['user_id'] = $user_id;
@@ -15,14 +16,16 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 
 ##getRow
     $user_id = get_current_user_id();
-    $general_info  = $OpsAttendee->getRow(['user_id' => $user_id]);
+    $general_info  = $OpsAttendee->getRow(['user_id' => $user_id]); //getRow($where)...where is an array...([])
     	// echo "<pre>";
      //    print_r($general_info);
      //    echo"</pre>";
 
     // $OpsHotelBooking = new OpsHotelBooking();
     $hotel_booking = $OpsHotelBooking->getRow(['user_id' => $user_id]);
-    $hotels = $OpsHotel->getAll('id');
+    	// echo "<pre>";
+     //    print_r($hotel_booking);
+     //    echo"</pre>";
 
     $flight = $OpsFlight->getRow(['user_id' => $user_id]);    
         // echo "<pre>";
@@ -81,6 +84,7 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 									<div class="form-group">
 										<label for="">Gender at Birth</label>
 										<div class="radio-btn radio-btn-inline">
+											<!-- use turnury to get value ###### <?= $general_info->sex == 'male' ? ' checked' : '' ?> ############ -->
 											<input type="radio" id="male" name="data[general][sex]" value="male" <?= $general_info->sex == 'male' ? ' checked' : '' ?>><label for="male">Male</label>
 											<input type="radio" id="female" name="data[general][sex]" value="female" <?= $general_info->sex == 'female' ? ' checked' : '' ?>><label for="female">Female</label>
 										</div>
@@ -123,9 +127,10 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 									<div class="form-group">
 										<label for="">Country</label>
 										<div class="select-wrapper">
-											<select class="select-style form-control" value="<?=$general_info->country;?>" name="data[general][country]">
+											<select class="select-style form-control" value="<?=$general_info->country;?>" name="data[general][country]"> <!-- value="code" using with form tabble -->
 												<?php foreach (OpsSelectOption::CountryName() as $country): ?>
-													<option <?=$country == $general_info->country ? "selected" : "";?>><?=$country;?></option>
+					<!-- use turnury to get value ###### <?= $country == $general_info->country ? "selected" : ""; ?> ############ -->
+													<option <?= $country == $general_info->country ? "selected" : "";?>><?=$country;?></option> <!-- <?=$country;?> show the value on front end -->
 												<?php endforeach;?>
 											</select>
 										</div>
@@ -330,15 +335,9 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 										<label for="">Hotel Name</label>
 										<div class="select-wrapper">
 											<select class="select-style form-control details-input-control" name="data[hotelBooking][hotel_name]">
-												<option value=""></option>
-				<!--hotel name form hotel table
-					<?=[ $hotel->id] == $hotel_booking->hotel_name ? 'selected' : '' ?>-> id from hotel table
-						[$hotel_booking->hotel_name]-> match with hotel_booking table 
-				-->								
-											<?php foreach ($hotels as  $hotel) { ?>
-												<option <?= $hotel->id == $hotel_booking->hotel_name ? 'selected' : '' ?> value="<?=$hotel->id ?>"><?= $hotel->name; ?></option>	
-											<?php } ?>
-			
+												<option value="1" <?=$hotel_booking->hotel_name == '1' ? 'selected' : '' ?>>1</option>
+												<option value="2" <?=$hotel_booking->hotel_name == '2' ? 'selected' : ''?>>2</option>
+												<option value="3" <?=$hotel_booking->hotel_name == '3' ? 'selected' : '' ?>>3</option>
 											</select>
 										</div>
 									</div>
@@ -468,7 +467,7 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 							<div class="form-group text-right">
 							<div class="btn btn-danger add-guest-btn" data-toggle="modal" data-target="#addGuestModal">Add Guest</div>
 						</div>
-						<table class="table table-bordered table-striped guest-table">
+						<table class="table table-bordered table-striped">
 							<thead>
 								<tr>
 									<th>First Name</th>
@@ -482,7 +481,7 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 							</thead>
 							<tbody>
 								<?php foreach ($guests as $guest) : ?>
-								<tr class="<?= "guest-{$guest->id}" ?>">
+								<tr>
 									<td><?= $guest->first_name ?></td>
 									<td><?= $guest->last_name ?></td>
 									<td><?= $guest->participation ?></td>
@@ -491,7 +490,7 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 									<td><?= $guest->food_allergies ?></td>
 									<td data-id=<?= $guest->id ?>>
 										<span href="" class="text-danger delete-guest"><i class="fa fa-trash"></i></span>
-										<span class="edit-row edit-guest" data-toggle="modal" data-target="#addGuestModal"><i class="fa fa-edit"></i></span>
+										<span class="edit-row" data-toggle="modal" data-target="#editGuestModal"><i class="fa fa-edit"></i></span>
 									</td>
 								</tr>
 								<?php endforeach;?>
@@ -521,18 +520,17 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 				<span class="modal-title">Add Guest</span>
 			</div>
 			<div class="modal-body">
-				<input type="hidden" name="id">
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
 							<label for="">First Name</label>
-							<input type="text" class="form-control" name="first_name" required>
+							<input type="text" class="form-control" name="first_name">
 						</div>
 					</div>
 					<div class="col-md-4">
 						<div class="form-group">
 							<label for="">Last Name</label>
-							<input type="text" class="form-control" name="last_name" required>
+							<input type="text" class="form-control" name="last_name">
 						</div>
 					</div>
 					<div class="col-md-4">
@@ -679,159 +677,11 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
 
 
 
-################################################          OpsAction.php             ###################################
-
-
-<?php  
-//public function init()
-{
-	add_action('admin_post_congress_registration', array($self, 'congress_registration'));
-    add_action('admin_post_nopriv_congress_registration', array($self, 'congress_registration'));
-}
-
-
-    //public function congress_registration()
-    {
-        if (!isset($_POST['CongressRegistration']) || !wp_verify_nonce( $_POST['CongressRegistration'], 'CongressRegistration-nonce' ) ) {
-             die("You are not allowed to submit data.");
-        }
-
-        if(!is_user_logged_in()){
-            die("You must log in "); //1st we check about user login
-        }
-
-
-            echo "<pre>";
-            print_r($_POST);
-            echo"</pre>";
-            die();
-####### this all field name are getting by print_r($_POST); .... 
-        $general_info = $_POST['data']['general'];  //$general_info---> using this variable we are passing all the post data
-        $hotel_info = $_POST['data']['hotelBooking'];
-        $flight_info = $_POST['data']['flightDetails'];
-
-##### 
-        $attendee_id = intval($_POST['attendee_id']); //this $_POST['attendee_id'] get from [FORM hidden field].....
-        $general_info['user_id'] = get_current_user_id();
-
-        $hotelBooking_id = intval($_POST['hotel_booking_id']);  //this $_POST['hotel_booking_id'] get from [FORM hidden field].....
-        $hotel_info['user_id'] =  get_current_user_id();
-
-        $flight_id = intval($_POST['flight_id']);    //this $_POST['flight_id'] get from [FORM hidden field].....
-        $flight_info['user_id'] =  get_current_user_id(); 
-
-## sanitization began
-        foreach ($general_info as $key => $value) {
-            $general_info[$key] = esc_sql($value);
-        }
-
-        foreach ($hotel_info as $key => $value) {
-            $hotel_info[$key] = esc_sql($value);
-        }
-
-        foreach ($flight_info as $key => $value) {
-            $flight_info[$key] = esc_sql($value);
-        }
-## sanitization end
-
-        #attendee 
-        $OpsAttendee = new OpsAttendee();
-
-        if($attendee_id > 0){
-            $OpsAttendee->update($general_info, ['id' => $attendee_id, 'user_id' => $general_info['user_id']]);
-        }
-        else{
-            $OpsAttendee->insert($general_info);
-        } 
-
-        #HotelBooking
-        $OpsHotelBooking = new OpsHotelBooking();
-
-        if ($hotelBooking_id > 0) {
-            $OpsHotelBooking->update($hotel_info, ['id' => $hotelBooking_id, 'user_id' => $hotel_info['user_id'] ]);
-        }
-         else{
-            $OpsHotelBooking->insert($hotel_info);
-        }
-
-        #flight
-        $OpsFlight = new OpsFlight();
-
-        if ($flight_id > 0) {
-            $OpsFlight->update($flight_info, ['id' => $flight_id, 'user_id' => $flight_info['user_id'] ]);
-        }
-         else{
-            $OpsFlight->insert($flight_info);
-        }
-            wp_redirect($_POST['_wp_http_referer'], 302);
-            exit();
-       
-    }
-
-
-    ########################################
-    ##########################################################									OR 			####################################################			#########################################################################################
-    #########################################################################
-    ############################################################################################	             below codes are more efficient 						##########################################################
-    ########################################################################################################### 										##########################################################
-
-    //public function congress_registration()
-    {
-        if (!isset($_POST['CongressRegistration']) || !wp_verify_nonce( $_POST['CongressRegistration'], 'CongressRegistration-nonce' ) ) {
-             die("You are not allowed to submit data.");
-        }
-
-        if(!is_user_logged_in()){
-            die("You must log in ");
-        }
-
-        $general_info = $_POST['data']['general'];
-        $hotel_info = $_POST['data']['hotelBooking'];
-        $flight_info = $_POST['data']['flightDetails'];
-
-        $user_id = get_current_user_id();
-
-        $general_info['user_id'] = $user_id;
-        $general_info['type'] = 'Member';
-        $hotel_info['user_id'] =  $user_id;
-        $flight_info['user_id'] =  $user_id;
-
-        foreach ($general_info as $key => $value) {
-            $general_info[$key] = esc_sql($value);
-        }
-
-        foreach ($hotel_info as $key => $value) {
-            $hotel_info[$key] = esc_sql($value);
-        }
-
-        foreach ($flight_info as $key => $value) {
-            $flight_info[$key] = esc_sql($value);
-        }
-
-
-        #attendee 
-        $OpsAttendee = new OpsAttendee();
-
-        # Check record for member If have update otherwise insert> ''
-        $OpsAttendee->updateOrInsert($general_info, ['user_id' => $general_info['user_id'], 'type' => 'Member'] );
-
-        #HotelBooking
-        $OpsHotelBooking = new OpsHotelBooking();
-        $OpsHotelBooking->updateOrInsert($hotel_info,['user_id' => $user_id] );
-    
-
-        #flight
-        $OpsFlight = new OpsFlight();
-        $OpsFlight->updateOrInsert($flight_info,['user_id' => $user_id] );
-
-        wp_redirect($_POST['_wp_http_referer'], 302);
-        exit();
-
-    }
 
 
 
-?>
+
+
 
 
 
