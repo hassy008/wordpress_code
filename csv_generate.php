@@ -5,13 +5,11 @@
  */
 class OpsDraftSubmission 
 {
-
 	protected $db;
 	protected $table;
 	
 	public function __construct()
     {
-
     	global $wpdb; 
 
     	$this->db = $wpdb;
@@ -27,14 +25,10 @@ class OpsDraftSubmission
 
 
 
-
-
-
-
-#####################################
+#####################################   [https://www.skalworldcongress2019.com/wp-admin/admin-post.php?action=generate_save_as_pdf]
 ##########################################      ######          OPSACTION          #############           ##########################################
 
-  //  public static function init()
+    public static function init()
     {
         $self = new self();
 
@@ -42,27 +36,22 @@ class OpsDraftSubmission
         add_action('admin_post_generate_save_and_continue', array($self, 'generateDraftSubmission'));
     }
 
-
-
+    //function to download csv
     function array_to_csv_download($array, $filename = "export.csv", $delimiter=";") {
-            header('Content-Type: application/csv');
-            header('Content-Disposition: attachment; filename="'.$filename.'";');
+        header('Content-Type: application/csv');
+        header('Content-Disposition: attachment; filename="'.$filename.'";');
 
-            // open the "output" stream
-            // see http://www.php.net/manual/en/wrappers.php.php#refsect2-wrappers.php-unknown-unknown-unknown-descriptioq
-            $f = fopen('php://output', 'w');
+        // open the "output" stream
+        // see http://www.php.net/manual/en/wrappers.php.php#refsect2-wrappers.php-unknown-unknown-unknown-descriptioq
+        $f = fopen('php://output', 'w');
 
-            foreach ($array as $line) {
-                fputcsv($f, $line);
-            }
-        } 
+        foreach ($array as $line) {
+            fputcsv($f, $line);
+        }
+    } 
 
-   // public function generateDraftSubmission()
+    public function generateDraftSubmission()
     {
-
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
 
         $OpsDraftSubmission = new OpsDraftSubmission();
 
@@ -70,7 +59,7 @@ class OpsDraftSubmission
 
         $report = [];
 
-    // Header 
+    // Header in csv file
         $report[] = [
             'created_at','First Name', 'Last Name', 'Email', 'Room', 'Category', 'Link'
         ];
@@ -83,7 +72,6 @@ class OpsDraftSubmission
 
             if(empty($submitted['6'] )) continue;     //if email is empty
 
-           
             $arr['created_at'] = $value->date_created;
             $arr['first_name'] = $submitted['5'];
             $arr['last_name'] = $submitted['4'];
@@ -95,9 +83,6 @@ class OpsDraftSubmission
 
             $report[]  = $arr;
         }
-
-
-
 
         $this->array_to_csv_download($report);
     }
