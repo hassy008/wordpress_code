@@ -150,7 +150,7 @@
 					</div>
 				</div>
 				<div class="text-right">
-					<div class="btn btn-danger" type="submit">Save</div>
+					<button class="btn btn-danger" type="submit">Save</button>
 				</div>
 				</form>
 			</div>
