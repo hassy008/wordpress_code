@@ -1,7 +1,13 @@
-<?php
+<?p<?php
 $OpsEarlyBirdBooking = new OpsEarlyBirdBooking();
 $no_of_person = $OpsEarlyBirdBooking->getBulkPersons(get_current_user_id())[0];
 
+//show SUM total amount against how many member_id created 
+$OpsBulkBooking = new OpsBulkBooking();
+$bulk_total = $OpsBulkBooking->bulkTotal(get_current_user_id());
+	echo "<pre>";
+    var_dump($bulk_total);
+    echo"</pre>";
 // $OpsBulkBooking = new OpsBulkBooking();
 //$members_name = $OpsBulkBooking->get(['id']);
 $args = array(
@@ -22,7 +28,13 @@ $args = array(
 	<div class="col-md-3" style="padding-left: 0px">
 		<div class="well" style="background-color: white;">
 			<h1 class="display-1" style="text-align: center"><?= $no_of_person ?></h1>
-			<p class="lead" style="text-align: center">Persons you registered as bulk.</p>
+			<p class="lead" style="text-align: center">Persons you registered as bulk</p>
+		</div>
+	</div>
+	<div class="col-md-3" style="padding-left: 0px">
+		<div class="well" style="background-color: white;">
+			<h1 class="display-1" style="text-align: center">$<?= number_format($bulk_total[0], 2)  ?></h1> <!--number_format/show with array[0]-->
+			<p class="lead" style="text-align: center">Total bulk amount</p>
 		</div>
 	</div>
 </div>
@@ -73,10 +85,7 @@ $args = array(
 			<div class="modal-body">
 			  <form  class="" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="POST">
 				<input type="hidden" name="action" value="save_bulk">
-				<input type="hidden" name="id" value="<?= $_GET['id']?>">
-
-													<input type="hidden" name="email" value="<?= $_GET['email']?>">
-				
+				<input type="hidden" name="id" value="<?= $_GET['id']?>">				
 				<?php wp_nonce_field('saveBulk-nonce', 'saveBulk');?>	
 				<div class="row">
 					<div class="col-md-12">
@@ -171,6 +180,45 @@ $args = array(
 <!-- Modal end-->
 
 
+
+<!-- #################################################################################################################
+#################################################################################################################
+############################################## 				OpsBulkBooking										###################################################################
+#################################################################################################################
+################################################################################################################# -->
+
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Mehedee
+ * Date: 1/5/2019
+ * Time: 12:22 PM
+ */
+
+class OpsBulkBooking extends AbstractModule
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->table = $this->db->prefix . "bulk_booking";
+    }
+
+    public function bulkTotal($user_id)
+    {
+    	return $this->db->get_col("SELECT COALESCE(SUM(amount), 0) from $this->table Where user_id = {$user_id} ");
+    }
+    
+}
+
+
+/////////
+//How do I get SUM function in MySQL to return '0' if no values are found?
+/*SELECT COALESCE(SUM(column),0)
+FROM   table
+WHERE  ...*/
+
+
+?>
 
 <!-- #################################################################################################################
 #################################################################################################################
