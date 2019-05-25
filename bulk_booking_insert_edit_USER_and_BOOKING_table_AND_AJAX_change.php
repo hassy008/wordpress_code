@@ -1,4 +1,4 @@
-<?p<?php
+<?php
 $OpsEarlyBirdBooking = new OpsEarlyBirdBooking();
 $no_of_person = $OpsEarlyBirdBooking->getBulkPersons(get_current_user_id())[0];
 
