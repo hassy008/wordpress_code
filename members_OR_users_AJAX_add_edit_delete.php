@@ -63,13 +63,13 @@ $search_col = esc_sql( $_GET['search_col'] );
 				<div class="form-group">
 					<div class="select-wrapper">
 						<select class="select-style form-control" name="search_col">
-							<option value="first_name" <?= $search_col == 'first_name' ? ' selected' : '' ?>>First Name</option>
-							<option value="last_name" <?= $search_col == 'last_name' ? ' selected' : '' ?>>Last Name</option>
-							<option value="email" <?= $search_col == 'email' ? ' selected' : '' ?>>Email</option>
-							<option value="Mobile_Phone" <?= $search_col == 'Mobile_Phone' ? ' selected' : '' ?>>Phone</option>
-							<option value="Country" <?= $search_col == 'Country' ? ' selected' : '' ?>>Country</option>
-							<option value="club" <?= $search_col == 'club' ? ' selected' : '' ?>>Club</option>
-							<option value="role_in_club" <?= $search_col == 'role_in_club' ? ' selected' : '' ?>>Role in Club</option>
+							<option value="first_name" <?= $search_col == 'first_name' ? 'selected' : '' ?>>First Name</option>
+							<option value="last_name" <?= $search_col == 'last_name' ? 'selected' : '' ?>>Last Name</option>
+							<option value="email" <?= $search_col == 'email' ? 'selected' : '' ?>>Email</option>
+							<option value="Mobile_Phone" <?= $search_col == 'Mobile_Phone' ? 'selected' : '' ?>>Phone</option>
+							<option value="Country" <?= $search_col == 'Country' ? 'selected' : '' ?>>Country</option>
+							<option value="club" <?= $search_col == 'club' ? 'selected' : '' ?>>Club</option>
+							<option value="role_in_club" <?= $search_col == 'role_in_club' ? 'selected' : '' ?>>Role in Club</option>
 						</select>
 					</div>
 				</div>
@@ -398,7 +398,7 @@ class OpsDashboardAction
 
 }        
 
-
+?>
 
 
 
