@@ -5,23 +5,24 @@ $no_of_person = $OpsEarlyBirdBooking->getBulkPersons(get_current_user_id())[0];
 //show SUM total amount against how many member_id created 
 $OpsBulkBooking = new OpsBulkBooking();
 $bulk_total = $OpsBulkBooking->bulkTotal(get_current_user_id());
-	echo "<pre>";
-    var_dump($bulk_total);
-    echo"</pre>";
+	
 // $OpsBulkBooking = new OpsBulkBooking();
 //$members_name = $OpsBulkBooking->get(['id']);
-$args = array(
-	'blog_id'      => $GLOBALS['blog_id'],
-	'orderby'      => 'login',
-	'order'        => 'ASC',
-	'fields'       => 'all',
 
- ); 
+	##members name by get_users
+	$args = array(
+		'blog_id'      => $GLOBALS['blog_id'],
+		'orderby'      => 'login',
+		'order'        => 'ASC',
+		'fields'       => 'all',
+	); 
 	$members = get_users( $args );
-	// echo "<pre>";
- //    print_r($members);
- //    echo"</pre>";
+
 	$getData   = $_GET['id'];
+
+	## get all data from bulk_booking_table
+	$current_user = get_current_user_id();
+	$bulk_name = $OpsBulkBooking->get(['user_id' => $current_user]);
 ?>
 
 <div class="row">
@@ -57,17 +58,20 @@ $args = array(
 					</tr>
 				</thead>
 				<tbody>
+				<?php foreach($bulk_name as $bulk ) :  $user = get_userdata($bulk->user_id); ?>	
 					<tr>
-						<td>Some</td>
-						<td>One</td>
-						<td>One@mail.com</td>
-						<td class="price">$1500</td>
+						<td><?= $user->first_name ?></td>
+						<td><?= $user->last_name ?></td>
+						<td><?= $user->user_email ?></td>
+						<td class="price">$<?= $bulk->amount; ?></td>
 						<!-- <td class="action">12.40.2019</td> -->
 						<td>
-							<span class="edit-row" data-toggle="modal" data-target="#editMemberModal"><i class="fa fa-edit"></i></span>
-							<span href="" class="text-danger"><i class="fa fa-trash"></i></span>
+							<span class="edit-bulk" data-toggle="modal" data-target="#editMemberModal" data-id="<?= $bulk->id;?>"><i class="fa fa-edit"></i></span>
+							<span class="delete-bulk" href="" class="text-danger" data-id="<?= $bulk->id; ?>"><i class="fa fa-trash"></i></span>
 						</td>
 					</tr>
+				<?php endforeach; ?>	
+
 				</tbody>
 			</table>
 		</div>
@@ -148,31 +152,42 @@ $args = array(
 				<span class="modal-title">Edit Member</span>
 			</div>
 			<div class="modal-body">
+			  <form  class="" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="POST">
+				<input type="hidden" name="action" value="update_bulk">
+				<input type="hidden" name="id">				
+				<input type="hidden" name="member_id">	<!-- get member_id-->			
+				<?php wp_nonce_field('updateBulk-nonce', 'updateBulk');?>
+					
 				<div class="row">
 					<div class="col-md-6">
 						<div class="form-group">
 							<label for="">First Name</label>
-							<input type="text" class="form-control">
+							<input type="text" class="form-control m_first_name" name="first_name">
 						</div>
+					</div>
+					<div class="col-md-6">
 						<div class="form-group">
 							<label for="">Last Name</label>
-							<input type="text" class="form-control">
+							<input type="text" class="form-control m_last_name" name="last_name">			
 						</div>
 					</div>
 					<div class="col-md-6">
 						<div class="form-group">
 							<label for="">Email</label>
-							<input type="text" class="form-control">
+							<input type="text" class="form-control" name="email">
 						</div>
-						<!-- <div class="form-group">
-							<label for="">Date</label>
-							<input type="text" class="form-control datepicker">
-						</div> -->
+					</div>
+					<div class="col-md-6">						
+						<div class="form-group">
+							<label for="">Price</label>
+							<input type="text" class="form-control" name="price">
+						</div>
 					</div>
 				</div>
 				<div class="text-right">
 					<button class="btn btn-danger" type="submit">Update</button>
 				</div>
+			  </form>	
 			</div>
 		</div>
 	</div>
@@ -247,7 +262,60 @@ class OpsAction
 
         add_action('admin_post_save_bulk', array($self, 'saveBulk'));
         add_action('admin_post_nopriv_save_bulk', array($self, 'saveBulk'));
+
+        add_action('admin_post_update_bulk', array($self, 'updateBulk'));
+        add_action('admin_post_nopriv_update_bulk', array($self, 'updateBulk'));
     }
+
+        public function updateBulk()
+    {
+        if (!isset($_POST['updateBulk']) || !wp_verify_nonce( $_POST['updateBulk'], 'updateBulk-nonce' )) {
+            die('You are not allow to submit data');
+        }
+
+        $member_id = $_POST['member_id'];
+        $email  = sanitize_email( $_POST['email'] );
+        $user   = get_user_by('email', $email);
+        $current_user_id = get_current_user_id();
+
+        $userdata = array(
+                'user_email'    => $_POST['email'],
+                'first_name'    => $_POST['first_name'],
+                'last_name'     => $_POST['last_name'],
+            );  
+ 
+        if($user){
+            $user_id = $user->ID;
+            wp_update_user( $userdata );
+        }
+
+         $OpsBulkBooking     = new OpsBulkBooking();
+            $data               = [];
+            $data['amount']     = floatval($_POST['price']);
+            $data['member_id']  = $member_id;
+            $data['user_id']    = $current_user_id;
+
+            $return             = $OpsBulkBooking->updateOrInsert($data, ['member_id' => $member_id]);
+
+            # assigned to payment table
+
+            $OpsPayment = new OpsPayment;
+            $OpsPayment->updateOrInsert(
+                [
+                    'user_id' => $user_id,
+                    'payment_method' => 'bulk',
+                    'status' => 'paid',
+                    'amount' => $data['amount']
+                ],
+                ['user_id' => $user_id]
+            );
+
+            wp_redirect($_POST['_wp_http_referer'], 302);
+            exit(); 
+
+    }
+
+
 
     public function saveBulk()
     {
@@ -283,13 +351,42 @@ class OpsAction
 
 <!-- #################################################################################################################
 #################################################################################################################
-############################################## 				OpsAction										###################################################################
+############################################## 				dash_2.js										###################################################################
 #################################################################################################################
 ################################################################################################################# -->
 <script>
 	
 	jQuery(function ($) {
 
+  	//update bulk 
+    $('.edit-bulk').on('click', function() {
+        let id = $(this).data('id');
+        console.log(id);
+        $('#editMemberModal').find("[name='id']").val(id);
+        $.ajax({
+                url: frontend_form_object.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'update_bulk',
+                    bulk_id: id,
+                    updateBulk: $('#updateBulk').val()
+                },
+            })
+            .done(function(response) {
+                if (response.success) {
+                    $("[name=first_name]").val(response.data.bulk_update.first_name);
+                    $("[name=last_name]").val(response.data.bulk_update.last_name);
+                    $("[name=email]").val(response.data.bulk_update.email);
+                    $("[name=price]").val(response.data.bulk_update.price);
+                    $("[name=member_id]").val(response.data.bulk_update.member_id);  //get member_id to update by member_id for update bulk by member_id
+                }
+            })
+            .fail(function() {
+                console.log("error");
+            })
+    })
+
+    //change member-name
     $(document).on('change','.bulkMemberModal .member-name', function () {
         let id = $(this).val();
         console.log(id);
@@ -325,7 +422,7 @@ class OpsAction
 
 <!-- #################################################################################################################
 #################################################################################################################
-############################################## 				OpsAction										###################################################################
+############################################## 				OpsAjaxAction										###################################################################
 #################################################################################################################
 ################################################################################################################# -->
 
@@ -342,6 +439,33 @@ class OpsAjaxAction
         $self = new self();
 
         add_action("wp_ajax_get_bulk_member", array($self, 'getBulkMember'));
+        add_action("wp_ajax_update_bulk", array($self, 'updateBulk'));
+
+    }
+
+    public function updateBulk()
+    {
+        if (!isset($_POST['updateBulk']) || !wp_verify_nonce($_POST['updateBulk'], 'updateBulk-nonce')) {
+            die("You are not allowed to submit data.");
+        }
+
+        $bulk_id = intval($_POST['bulk_id']);
+
+        $OpsBulkBooking = new OpsBulkBooking();
+        $response = $OpsBulkBooking->getRow(['id' => $bulk_id]);
+        
+        //show first_name/last_name by $user_id..........
+        $data = [];
+        $data['first_name'] = get_user_meta( $response->user_id, 'first_name', true );
+        $data['last_name'] = get_user_meta( $response->user_id, 'last_name', true );
+        $user = get_user_by( 'ID', $response->user_id );
+        $data['email'] = $user->user_email;//get email by user_id
+        
+        $data['price'] = $response->amount; 
+        $data['member_id'] = $response->member_id;  //get member_id to update by member_id
+
+        wp_send_json_success(['bulk_update' => $data]);
+
     }
 
     public function getBulkMember()
