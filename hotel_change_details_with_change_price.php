@@ -70,6 +70,7 @@
 				<div class="form-group">
 					<label for="">Check-In Date/Time</label>
 					<?php  
+					//show DateTime with format
 						if (!empty($hotel_booking->check_id)) {
 							$date = new DateTime($hotel_booking->check_id);
 							$check_in = $date->format("m/d/Y H:i A");
@@ -103,53 +104,6 @@
 
 
 
-
-
-
-<!-- #########################################################################################
-#########################################################################################
-############################### 		OpsAjaxAction.php			##########################################################
-#########################################################################################
-######################################################################################### -->
-
-<?php
-
-/**
- *
- */
-class OpsAjaxAction
-{
-
-    static public function init ()
-    {
-        $self = new self();
-
-        	add_action("wp_ajax_hotel_change_details", array($self, 'hotelChangeDetails'));
-
-        //add_action( "wp_ajax_nopriv_linked_banks", array($self, '') );
-    }
-    public function hotelChangeDetails ()
-    {
-        $OpsHotel = new OpsHotel();
-        $id = intval($_POST['id']);
-        $categories = (new OpsHotelRoom)->get(['hotel_id' => $id]);
-
-
-        $user_id = intval($_POST['user_id']);
-        $hotel_booking = (new OpsHotelBooking)->getRow(['user_id' => $user_id]);
-
-        $categotyOptions = '<option></option>';
-        foreach ($categories as $category) {
-
-            $selected = $hotel_booking->room_type == $category->id ? 'selected' : '';
-
-            $categotyOptions .= "<option data-price='{$category->price}' data-cap='{$category->capacity}' value='{$category->id}' {$selected} >{$category->category} (&#36;{$category->price}  CAD)</option>";
-        }
-
-        wp_send_json_success(['cat' => $categotyOptions]);
-    }
-}
-?>
 
 <!-- #########################################################################################
 ###########################################################################################
@@ -209,3 +163,51 @@ class OpsAjaxAction
     }
 
 </script>
+
+
+
+<!-- #########################################################################################
+#########################################################################################
+############################### 		OpsAjaxAction.php			##########################################################
+#########################################################################################
+######################################################################################### -->
+
+<?php
+
+/**
+ *
+ */
+class OpsAjaxAction
+{
+
+    static public function init ()
+    {
+        $self = new self();
+
+        	add_action("wp_ajax_hotel_change_details", array($self, 'hotelChangeDetails'));
+
+        //add_action( "wp_ajax_nopriv_linked_banks", array($self, '') );
+    }
+    public function hotelChangeDetails ()
+    {
+        $OpsHotel = new OpsHotel();
+        $id = intval($_POST['id']);
+        $categories = (new OpsHotelRoom)->get(['hotel_id' => $id]);
+
+
+        $user_id = intval($_POST['user_id']);
+        $hotel_booking = (new OpsHotelBooking)->getRow(['user_id' => $user_id]);
+
+        $categotyOptions = '<option></option>';
+        foreach ($categories as $category) {
+
+            $selected = $hotel_booking->room_type == $category->id ? 'selected' : '';
+
+            $categotyOptions .= "<option data-price='{$category->price}' data-cap='{$category->capacity}' value='{$category->id}' {$selected} >{$category->category} (&#36;{$category->price}  CAD)</option>";
+        }
+
+        wp_send_json_success(['cat' => $categotyOptions]);
+    }
+}
+?>
+
