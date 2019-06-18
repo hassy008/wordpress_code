@@ -24,6 +24,17 @@
 			<?php wp_nonce_field('progressTracker-nonce', 'progressTracker');?>
 
 			<table class="table table-bordered">
+
+				<!-- logged in user can only get access Beginning -->
+				<?php
+				   // $user_data = wp_get_current_user();
+				    if (!is_user_logged_in()) : ?>
+				        <div class="well" style="margin-top: 20px">
+				            <span class="text-danger">You have to login to view the page. <a href="<?php echo wp_login_url( get_permalink() ); ?>" title="Login">Click here to login</a>.</span> 
+				        </div>
+				<?php return false; endif;  ?>
+				<!-- logged in user can only get access End -->
+
 				<tbody>
 					<tr>
 						<td colspan="6" class="gray-bg" style="text-align: center; font-size: 18px; font-weight: bold;">PROGRESS TRACKER</td>
