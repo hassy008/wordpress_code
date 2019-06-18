@@ -665,7 +665,7 @@ $attendees    = $OpsAttendee->getAllSoftDelete(['user_id' => $user_id]);
     public function congress_registration()
     {
         if (!isset($_POST['CongressRegistration']) || !wp_verify_nonce( $_POST['CongressRegistration'], 'CongressRegistration-nonce' ) ) {
-             die("You are not allowed to submit data.");
+            die("You are not allowed to submit data.");
         }
 
         if(!is_user_logged_in()){

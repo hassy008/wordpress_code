@@ -6,7 +6,6 @@
 	$add_hotels = $OpsHotel->getAll('id');
 
 	$hotel_rooms = $OpsHotelRoom->getAll('id');    
-
 ?>
 
 <div class="bootstrap-wrapper">
@@ -64,7 +63,7 @@
 							?>
 							<tr>
 								<td class="action"><?= $hotel_room->id; ?></td>
-								<td><?php $hotel = (new OpsHotel)->getRow(['id' => $hotel_room->hotel_id]); echo $hotel->name; ?></td>
+								<td><?php $hotel = (new OpsHotel)->getRow(['id' => $hotel_room->hotel_id]); echo $hotel->name; ?></td> <!-- 'id' from hotel table id -->
 								<td><?= $hotel_room->category; ?></td>
 								<td><?= $hotel_room->no_of_room; ?></td>
 								<td><?= $hotel_room->capacity; ?></td>
@@ -247,8 +246,6 @@ class OpsDashboardAction
         $data['category'] = $_POST['category'];
         $data['price'] = $_POST['price'];
         $data['no_of_room'] = $_POST['no_of_room'];
-
-        
 
         $OpsHotelRoom->updateOrInsert($data, ['id' => $id]);
             // echo "<pre>"; print_r($data); echo "</pre>";
