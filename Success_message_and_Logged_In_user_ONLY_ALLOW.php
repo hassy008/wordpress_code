@@ -32,14 +32,15 @@ $user_id = get_current_user_id();
 
 
 
-<!-- Success message -->
-
+<!-- Success message use $_SESSION beginning-->
+                                                                <!-- Accessing SESSION Values -->
 <?php if (isset($_SESSION['message'])) : ?>
     <div class="alert alert-<?= $_SESSION['type'] ?>">
         <?= $_SESSION['message'] ?>
     </div>
 <?php endif; unset($_SESSION['message']); unset($_SESSION['type']); ?>
     
+                                                            <!-- $_SESSION function -->
     <?
          if (! is_wp_error($is_success)) {
             $_SESSION['type']    = 'success';
@@ -50,3 +51,31 @@ $user_id = get_current_user_id();
 
             $_SESSION['type']    = 'danger';
             $_SESSION['message'] = 'Something went wrong. Please try again later. If problem persists, please contact us.';
+?>
+<!-- Success message use $_SESSION end-->
+
+
+
+
+<!-- Success message use $_COOKIE beginning-->
+                                    <!-- Accessing Cookies Values -->
+    <?php if (isset($_COOKIE['message'])) : ?>
+        <div class="alert alert-<?= $_COOKIE['type'] ?>">
+            <?= $_COOKIE['message'] ?>
+        </div>
+    <?php endif; 
+        unset($_COOKIE['message']); unset($_COOKIE['type']); 
+        setcookie('message', "", time() - 3600, '/'); setcookie('type', "", time() - 3600, '/'); //this line to delete cookie
+    ?>
+
+
+                                    <!-- $_COOKIE function -->
+        <!-- //show success message Setting a cookie -->
+        <?
+//      setcookie(name, value, expire, path, domain, secure);
+
+        setcookie('type', 'success', time() + (86400 * 30), "/");
+        setcookie('message', 'Successfully Saved.', time() + (86400 * 30), "/");
+
+        ?>
+<!-- Success message use $_COOKIE end-->
