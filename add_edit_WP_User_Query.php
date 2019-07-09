@@ -175,16 +175,16 @@
         }
         else{
         $userdata = array(
-            'ID' => $_POST['user_id'],
+            'ID'                  => $_POST['user_id'],
             // 'user_login'            => $_POST['first_name'].$_POST['last_name'],   
-            'user_pass'             => $_POST['password'],
-            'user_email'            => $_POST['email'],   
-            'first_name'            => $_POST['first_name'],   
-            'last_name'             => $_POST['last_name'],  
+            'user_pass'           => $_POST['password'],
+            'user_email'          => $_POST['email'],   
+            'first_name'          => $_POST['first_name'],   
+            'last_name'           => $_POST['last_name'],  
             //'role'                 => $_POST['role_in_club'],   //(string) User's role.
-            'Mobile_Phone'         => $_POST['phone'],
-            'Country'              => $_POST['country'],         
-           // 'club'               => $_POST['club'],         
+            'Mobile_Phone'        => $_POST['phone'],
+            'Country'             => $_POST['country'],         
+           // 'club'              => $_POST['club'],         
         );   
         $user_update = wp_update_user( $userdata ) ;
 

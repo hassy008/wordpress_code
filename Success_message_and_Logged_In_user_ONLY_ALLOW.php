@@ -33,14 +33,14 @@ $user_id = get_current_user_id();
 
 
 <!-- Success message use $_SESSION beginning-->
-                                                                <!-- Accessing SESSION Values -->
+                            <!-- Accessing SESSION Values -->
 <?php if (isset($_SESSION['message'])) : ?>
     <div class="alert alert-<?= $_SESSION['type'] ?>">
         <?= $_SESSION['message'] ?>
     </div>
 <?php endif; unset($_SESSION['message']); unset($_SESSION['type']); ?>
     
-                                                            <!-- $_SESSION function -->
+                            <!-- $_SESSION function -->
     <?
          if (! is_wp_error($is_success)) {
             $_SESSION['type']    = 'success';
